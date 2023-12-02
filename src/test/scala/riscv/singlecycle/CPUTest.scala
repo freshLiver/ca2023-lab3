@@ -113,3 +113,22 @@ class ByteAccessTest extends AnyFlatSpec with ChiselScalatestTester {
     }
   }
 }
+
+class SimpleTest extends AnyFlatSpec with ChiselScalatestTester {
+  behavior.of("Simple Test")
+  it should "Test Handwritten Assembly on MyCPU" in {
+    test(new TestTopModule("simple.asmbin")).withAnnotations(TestAnnotations.annos) { c =>
+      for (i <- 1 to 50) {
+        c.clock.step()
+        c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
+      }
+      c.io.regs_debug_read_address.poke(8.U) // s0
+      println(s"s0: ${c.io.regs_debug_read_data.peek()}")
+      c.io.regs_debug_read_address.poke(9.U) // s1
+      println(s"s1: ${c.io.regs_debug_read_data.peek()}")
+      c.io.regs_debug_read_address.poke(10.U) // a0
+      println(s"a0: ${c.io.regs_debug_read_data.peek()}")
+      c.io.regs_debug_read_data.expect(0x12345678L.U)
+    }
+  }
+}
