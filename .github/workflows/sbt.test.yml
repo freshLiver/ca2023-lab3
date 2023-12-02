@@ -1,0 +1,28 @@
+name: MyCPU Testing
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-22.04 # https://github.com/actions/runner-images/tree/main
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Chisel Env
+        run:  |
+              sudo apt-get update && sudo apt-get -y install build-essential curl wget zip unzip verilator
+              sbt --version
+
+      - name: Setup RISC-V Env
+        run:  |
+              wget https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64.tar.gz
+              tar zxvf xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64.tar.gz
+              cp -af xpack-riscv-none-elf-gcc-13.2.0-2 $HOME/riscv-none-elf-gcc
+              export PATH="$HOME/riscv-none-elf-gcc/bin:$PATH"
+              riscv-none-elf-gcc -v
+
+      - name: Build and Test
+        run:  |
+              export PATH="$HOME/riscv-none-elf-gcc/bin:$PATH"
+              make -C csrc update
+              sbt test
