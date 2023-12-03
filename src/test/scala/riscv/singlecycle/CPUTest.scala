@@ -122,12 +122,17 @@ class SimpleTest extends AnyFlatSpec with ChiselScalatestTester {
         c.clock.step()
         c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
       }
+      c.io.mem_debug_read_address.poke(0x1000.U) // first instruction
+      c.clock.step()
+      println(f"mem[${c.io.mem_debug_read_address.peek().litValue}%08x]: ${c.io.mem_debug_read_data.peek().litValue}%08x")
+
       c.io.regs_debug_read_address.poke(8.U) // s0
-      println(s"s0: ${c.io.regs_debug_read_data.peek()}")
+      println(f"s0: ${c.io.regs_debug_read_data.peek().litValue}%08x")
+
       c.io.regs_debug_read_address.poke(9.U) // s1
-      println(s"s1: ${c.io.regs_debug_read_data.peek()}")
+      c.io.regs_debug_read_data.expect(1234.U) // s1
+
       c.io.regs_debug_read_address.poke(10.U) // a0
-      println(s"a0: ${c.io.regs_debug_read_data.peek()}")
       c.io.regs_debug_read_data.expect(0x12345678L.U)
     }
   }

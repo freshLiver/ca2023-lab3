@@ -8,7 +8,7 @@ mdata:
 .text
 main:
     li s1, 1234
-    la s0, .data
+    li s0, 0x1014
     lw a0, 0(s0)
 loop:
     j loop
